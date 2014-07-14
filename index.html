@@ -1,16 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Jane Mendonca</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
-  </head>
+<html ng-app="janeM">
+<head>
+	<title>Jane Mendonca</title>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+	<script type="text/javascript" src="js/index.js"></script>
+	<style>
+		@font-face {
+    font-family: 'LigatureSymbols';
+    src: url('LigatureSymbols/LigatureSymbols-2.11.eot');
+    src: url('LigatureSymbols/LigatureSymbols-2.11.eot?#iefix') format('embedded-opentype'),
+         url('LigatureSymbols/LigatureSymbols-2.11.woff') format('woff'),
+         url('LigatureSymbols/LigatureSymbols-2.11.ttf') format('truetype'),
+         url('LigatureSymbols/LigatureSymbols-2.11.svg#LigatureSymbols') format('svg');
+    src: url('LigatureSymbols/LigatureSymbols-2.11.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 
-  <body>
-
-    <div>
-      <label>Jane Mendonca</label>
-    </div>
-  </body>
+.lsf{
+  font-family: 'LigatureSymbols';
+  -webkit-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  -ms-text-rendering: optimizeLegibility;
+  -o-text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -ms-font-smoothing: antialiased;
+  -o-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}
+	</style>
+</head>
+<body>
+	<section><p>This page is still under construction! Come back soon!</p></section>
+	<section ng-controller="AboutMe as me">		
+		<h1>{{me.product.firstName +" "+ me.product.lastName}}</h1>
+		<ul>
+			<li ng-repeat="obj in me.product.designation">{{obj.title}}</li>
+		</ul>	
+		<ul>
+			<li class="lsf" ng-repeat="obj in me.product.links"><a ng-href="{{obj.url}}">{{obj.text}}</a></li>
+		</ul>
+	</section>
+</body>
 </html>
