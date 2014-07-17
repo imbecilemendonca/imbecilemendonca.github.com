@@ -3,45 +3,21 @@
 <head>
 	<title>Jane Mendonca</title>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-	<script type="text/javascript" src="js/index.js"></script>
-	<style>
-		@font-face {
-    font-family: 'LigatureSymbols';
-    src: url('LigatureSymbols/LigatureSymbols-2.11.eot');
-    src: url('LigatureSymbols/LigatureSymbols-2.11.eot?#iefix') format('embedded-opentype'),
-         url('LigatureSymbols/LigatureSymbols-2.11.woff') format('woff'),
-         url('LigatureSymbols/LigatureSymbols-2.11.ttf') format('truetype'),
-         url('LigatureSymbols/LigatureSymbols-2.11.svg#LigatureSymbols') format('svg');
-    src: url('LigatureSymbols/LigatureSymbols-2.11.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-.lsf{
-  font-family: 'LigatureSymbols';
-  -webkit-text-rendering: optimizeLegibility;
-  -moz-text-rendering: optimizeLegibility;
-  -ms-text-rendering: optimizeLegibility;
-  -o-text-rendering: optimizeLegibility;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-font-smoothing: antialiased;
-  -ms-font-smoothing: antialiased;
-  -o-font-smoothing: antialiased;
-  font-smoothing: antialiased;
-}
-	</style>
+	<script type="text/javascript" src="index.js"></script>
+  <link href="index.css" rel="stylesheet" type="text/css"></link>
 </head>
 <body>
-	<section><p>This page is still under construction! Come back soon!</p></section>
-	<section ng-controller="AboutMe as me">		
-		<h1>{{me.product.firstName +" "+ me.product.lastName}}</h1>
-		<ul>
-			<li ng-repeat="obj in me.product.designation">{{obj.title}}</li>
-		</ul>	
-		<ul>
-			<li class="lsf" ng-repeat="obj in me.product.links"><a ng-href="{{obj.url}}">{{obj.text}}</a></li>
-		</ul>
-	</section>
+  <div class="wrapper">
+    <section><p class="textaligncenter"><img src="construction.png"></p></section>
+    <section ng-controller="AboutMe as me" class="textaligncenter">   
+      <label class="fontsize48">{{me.product.firstName +" "+ me.product.lastName}}</label>
+      <ul>
+        <li ng-repeat="obj in me.product.designation">{{obj.title}}</li>
+      </ul> 
+      <ul class="fontsize24">
+        <li class="lsf" ng-repeat="obj in me.product.links"><a ng-href="{{obj.url}}">{{obj.text}}</a></li>
+      </ul>
+    </section>
+  </div>	
 </body>
 </html>
