@@ -1,0 +1,487 @@
+<!-- *************************
+Author: Jane Mendonca, E566169
+Author: Sujith MR, E547533
+©copyright 2013
+****************************** -->
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript">
+	var cvs,ctx,minEdgeX,maxEdgeX,minEdgeY,maxEdgeY;
+	var score=0;
+	var bGrow=false, bStop = false, bPause=false;
+	var interval;
+	var highScore = new Array();
+	var maxRank = 3;
+	var screenHeight,screenWidth;
+	var pressedKey,prevKey;
+	var version = "1.0";
+	var instructions= [	"<p>Welcome to Slug! Gobble up bait & earn points!</p>",
+						"<p>Congratulations! You have won the game! Play it again!<p>",
+						"<p>Invalid move!</p>",
+						"<p>The walls are made of salt! Game Over!</p>"
+						];
+	var alert = [ "<p>Game Paused. Hit P to resume.</p>"
+				];
+	/*SLUG OBJ*/
+	var slugSegment = { 'number' : 0, 'width' :15, 'height':15, 'headColour': "#000000",'bodyColour': "#000000", 'offset':1};
+	var slugPos = new Array();
+	
+	/*BAIT OBJ*/
+	var bait = {'posX':0,'posY':0,'radius':3,'colour':"#FF0000"};
+	
+	/*GENERAL FUNCTIONS*/
+	function init(){
+		readHighScore();
+		
+		cvs = document.getElementById('lulzcanvas');
+		ctx = cvs.getContext('2d'); 
+		
+		t="black";
+		ctx.fillStyle = t;
+		
+		minEdgeX=minEdgeY=0;
+		maxEdgeX=cvs.width-slugSegment.width;
+		maxEdgeY=cvs.height-slugSegment.height;
+		
+		
+		createSlug();
+		randomizeBait();
+		
+		document.getElementById('scorecount').innerHTML=score;
+		updateInstructions(instructions[0]);
+		calcScreenSize();
+		setVersion();
+	}
+	function setVersion(){
+		document.getElementById('version').innerHTML = version;
+	}
+	function calcScreenSize(){
+		screenHeight = window.innerHeight;
+		screenWidth = window.innerWidth;
+		document.getElementById('bodyID').style.width = screenWidth + "px";
+		document.getElementById('bodyID').style.height = screenHeight + "px";
+		document.getElementById('alertOverlay').style.width = screenWidth + "px";
+		document.getElementById('alertOverlay').style.height = screenHeight + "px";
+	}
+	function updateScore(){
+		score+=10;
+		document.getElementById('scorecount').innerHTML=score;
+		if(score%50==0 && slugSegment.offset<16)
+			slugSegment.offset*=2;
+	}
+	function clearCanvas(){
+		ctx.clearRect(0, 0, cvs.width, cvs.height);
+	}
+	function scaleHeight(hvar){
+			return hvar * 0.5;
+	}
+	function randomizecolour(){
+		return '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
+	}
+	function refreshGame(){
+		bStop=false;
+		ctx.globalAlpha = 1;
+		score=0;
+		document.getElementById('scorecount').innerHTML=score;
+		updateInstructions(instructions[0]);
+		clearCanvas();
+		createSlug();
+		randomizeBait();
+	}
+	function updateInstructions(text){
+		document.getElementById('instructions').innerHTML = text;
+	}
+	function loseGame(){
+		updateInstructions(instructions[3]);
+		bStop = true;
+		if(interval) window.clearInterval(interval);
+		finishGame();
+	}
+	function pauseGame(){
+		alertDiv = document.getElementById('alertDiv');
+		if(bPause){
+			bPause=false;
+			hideAlertOverlay();
+			alertDiv.style.display="none";
+			pressedKey=prevKey;
+			startMovement(pressedKey);
+		}
+		else{
+			bPause=true;
+			if(interval)	window.clearInterval(interval);
+			showAlertOverlay();
+			alertDiv.style.display="block";
+			updateAlert(alert[0],alertDiv);
+		}
+	}
+	function drawGrayCanvas(){
+		ctx.fillStyle = "gray";
+		ctx.globalAlpha = 0.3;
+		ctx.fillRect(0,0,cvs.width,cvs.height);
+	}
+	function finishGame(){
+		drawGrayCanvas();
+		updateHighScore();
+	}
+	function showAlertOverlay(){
+		document.getElementById('alertOverlay').style.display="block";
+	}
+	function hideAlertOverlay(){
+		document.getElementById('alertOverlay').style.display="none";
+	}
+	function updateAlert(msg,ele){
+		ele.innerHTML = msg;
+	}
+	/*HIGH SCORE FUNCTIONS*/
+	var scoreRank=0;
+	function readHighScore(){
+		highScore.push({'score':0, 'name':0});
+		for(var i=1;i<=maxRank;i++){
+				highScore.push({'score':localStorage.getItem('slugscore'+i), 'name':localStorage.getItem('slugname'+i)});
+				if(highScore[i].score==null) highScore[i].score=0;
+		}
+	}
+	function updateHighScore(){				
+			scoreRank = compareHighScore();
+			showAlertOverlay();
+			if(scoreRank)	getPlayerName();
+			else showHighScoreTable();			
+	}
+	function compareHighScore(){
+		for(var i=1;i<=maxRank;i++){
+			if(score>highScore[i].score)	return i;
+		}
+		return 0;
+	}
+	function saveHighScore(){
+		for(var i=maxRank;i>scoreRank;i--){
+			highScore[i].score=highScore[i-1].score;
+			highScore[i].name=highScore[i-1].name;
+		}
+		highScore[scoreRank].score=score;	
+		highScore[scoreRank].name=document.getElementById('txtplayerName').value;
+		
+		showHighScoreTable();
+	}
+	function writeHighScore(){
+		for(var i=1;i<=maxRank;i++){
+			localStorage.setItem('slugscore'+i,highScore[i].score);
+			localStorage.setItem('slugname'+i,highScore[i].name);
+		}
+	}
+	function showHighScoreTable(){
+		updateHighScoreTable();
+	}
+	function updateHighScoreTable(){
+		tableObj = document.getElementById('scoreTable');
+		tableObj.innerHTML = '<p>HIGH SCORES</p>';
+		for(var i=1;i<=maxRank;i++){
+			if(highScore[i].score==0) break;
+			tableObj.innerHTML += '<p> '+i+' |  '+highScore[i].name+' |  '+highScore[i].score+'</p>';
+		}
+		tableObj.style.display="block";
+		document.getElementById('closeBtn').style.display = "block";
+	}
+	function hideHighScoreTable(){
+		hideAlertOverlay();
+		document.getElementById('scoreTable').style.display = "none";
+		document.getElementById('closeBtn').style.display = "none";
+	}
+	function getPlayerName(){
+		document.getElementById('Name').style.display="block";
+		document.getElementById('txtplayerName').focus();
+	}
+	function savePlayerName(){
+		document.getElementById('Name').style.display="none";
+		saveHighScore();
+	}
+	/*KEYPRESS FUNCTIONS*/
+	function drawKeydown(e){
+		if(bStop && e.keyCode==13){
+			refreshGame();
+			return;
+		}
+		if(bPause && e.keyCode==80){
+			pauseGame();
+			return;
+		}
+		if(bPause || bStop) return;
+		
+		e = e || window.event;
+		switch(e.keyCode){
+			case 37: pressedKey='left';break;
+			case 38: pressedKey='up';break;
+			case 39: pressedKey='right';break;
+			case 40: pressedKey='down';break;
+			case 80: prevKey=pressedKey;pressedKey='p';pauseGame();return;
+			default: break;
+		}		
+		startMovement(pressedKey);		
+	}
+	function startMovement(dir){
+		if(interval)	window.clearInterval(interval);
+		interval = window.setInterval(function () {
+			doKeydownChange(dir);
+		}, 20);
+	}
+	
+	/*Slug FUNCTIONS*/
+	document.onkeydown = drawKeydown;
+	function createSlug(){
+		slugSegment.number = 0;
+		slugSegment.offset = 1;
+		slugSegment.headColour = "#000000";
+		
+		slugPos = new Array();
+		growSlug(30,50);
+		drawSlug();
+	}
+	function growSlug(tempx,tempy){	
+		if(slugSegment.number==1)
+			slugSegment.headColour="#00CC00";
+		slugPos.push({'posX':tempx,'posY':tempy});
+		slugSegment.number++;
+	}	
+	function drawSlug(){
+		ctx.fillStyle = slugSegment.headColour;
+		for(var i=0;i<slugSegment.number;i++){
+			ctx.fillRect(slugPos[i].posX,slugPos[i].posY,slugSegment.width,slugSegment.height);
+			ctx.fillStyle = slugSegment.bodyColour;
+		}
+	}
+	function clearSlug(){
+		for(var i=0;i<slugSegment.number;i++){
+			ctx.clearRect(slugPos[i].posX,slugPos[i].posY,slugSegment.width,slugSegment.height);
+		}
+	}
+	function animateSlug(){
+		drawSlug();
+		drawBait();
+		checkBait();
+	}
+	function checkCollision(){
+		if(!validatePos(slugPos[0].posX, slugPos[0].posY)){
+			updateInstructions(instructions[3]);
+			pauseGame();
+		}
+	}
+	function calcSlugPos(dir){
+		newSlugPosX = slugPos[0].posX;
+		newSlugPosY = slugPos[0].posY;
+		
+		switch(dir){
+			case 'left': newSlugPosX=slugPos[0].posX-slugSegment.offset;break;
+			case 'right': newSlugPosX=slugPos[0].posX+slugSegment.offset;break;
+			case 'up': newSlugPosY=slugPos[0].posY-slugSegment.offset;break;
+			case 'down': newSlugPosY=slugPos[0].posY+slugSegment.offset;break;
+		}
+		updateInstructions(instructions[0]);
+		slugPos = changeSlugBodyPos(slugPos);
+		slugPos[0].posX = newSlugPosX;
+		slugPos[0].posY = newSlugPosY;
+	}	
+	function doKeydownChange(dir){
+		if(bGrow){
+			growSlug(0,0);
+			bGrow=false;
+		}
+		clearSlug();
+		calcSlugPos(dir);
+		checkBoundary();
+		animateSlug();
+	}
+	function checkBoundary(){
+		if((slugPos[0].posX<minEdgeX)||
+		(slugPos[0].posX>maxEdgeX) ||
+		(slugPos[0].posY<minEdgeY) ||
+		(slugPos[0].posY>maxEdgeY)) loseGame();
+	}
+	function validatePos(newX, newY){
+		for(i=0;i<slugPos.length;i++){
+			if(slugPos[i].posX==newX && slugPos[i].posY==newY)
+				return false;
+		}
+		return true;
+	}
+	function changeSlugBodyPos(arr){
+		var temp = new Array();
+		temp.push({'posX':arr[arr.length-1].posX,'posY':arr[arr.length-1].posY});
+		for (i = 0; i <= arr.length-2; i++) temp.push({'posX':arr[i].posX,'posY':arr[i].posY});
+		return temp;
+	}
+	/*BAIT FUNCTIONS*/
+	function randomizeBait(){
+		setBaitColour();
+		bait.posX = Math.floor(Math.random()*maxEdgeX);
+		bait.posY = Math.floor(Math.random()*maxEdgeY);
+		if(!validatePos(bait.posX, bait.posY) || !validatePosInCanvas(bait.posX, bait.posY))	randomizeBait();
+		drawBait();
+	}
+	function drawBait(){
+		ctx.beginPath();
+		ctx.arc(bait.posX, bait.posY, bait.radius, 0, 2 * Math.PI, false);
+		ctx.fillStyle = bait.colour;
+		ctx.fill();
+		ctx.stroke();
+	}
+	function clearBait(){
+		clearCanvas();
+		drawSlug();
+		randomizeBait();
+	}
+	function checkBait(){
+			if(collisionSlugBait()){
+				eatBait();
+			}
+	}
+	function eatBait(){		
+				clearBait();
+				updateScore();
+				bGrow=true;
+	}
+	function setBaitColour(){
+		bait.colour = randomizecolour();
+	}
+	function validatePosInCanvas(newX,newY){
+		if(bait.posX<bait.radius || bait.posY<bait.radius)	return false;
+		return true;
+	}
+	/*COLLISION FUNCTIONS*/
+	function collisionSlugBait(){	
+		// Slug's top border collided with bait's bottom border
+		sTopbBot = (slugPos[0].posY > bait.posY) && (slugPos[0].posY < bait.posY + bait.radius);
+		// Slug's bottom border collided with bait's top border
+		sBotbTop = (slugPos[0].posY < bait.posY) && (bait.posY < slugPos[0].posY + slugSegment.height);
+		// Slug's right border collided with bait's left border
+		sRightbLeft = (slugPos[0].posX < bait.posX) && (bait.posX < slugPos[0].posX + slugSegment.width);
+		// Slug's left border collided with bait's right border
+		sLeftbRight = ((slugPos[0].posX > bait.posX) && (slugPos[0].posX < bait.posX + bait.radius));
+		
+		if((sTopbBot && sRightbLeft) || (sTopbBot && sLeftbRight) || (sBotbTop && sLeftbRight) || (sBotbTop && sRightbLeft))
+			return true; 
+	}
+	
+	window.onresize = calcScreenSize;
+</script>
+<style>
+body{
+	font-weight:bold;
+	margin:0;
+}
+#lulzcanvas{
+	border:solid 1px black;
+}
+#scorelbl{
+	padding-right:5px;
+}
+#copyright:hover{
+	-webkit-animation:chgcolor 5s alternate;
+}
+#container{
+	width:503px;
+}
+#copyright{
+	float:right;
+}
+@-webkit-keyframes chgcolor{
+	0%{color:#000000;}
+	25%{color:#FF0000;}
+	50%{color:#FFFF00;}
+	75%{color:#FF00FF;}
+	100%{color:#00FFFF;}
+}
+#alertOverlay{
+	display:none;
+	background:rgba(0,0,0,0.7);
+	top:0;
+	left:0;
+	margin:0;
+}
+.centerThis{
+	position:absolute;
+}
+.centerThis > div{
+	display: table-cell; 
+	vertical-align: middle; 
+	text-align: center; 
+	height:inherit; 
+	width:inherit;
+}
+.centerThis > div > div{
+	display: inline-block;
+}
+#scoreTable{
+	display:none;
+}
+#alertOverlay p{
+	text-align:center;
+}
+#Name{
+	display:none;
+}
+.backgroundContainer{
+	width:400px;
+	background:rgb(239, 241, 250);
+	border-radius:10px;
+	padding:10px;
+}
+input[type="button"]{
+	background:wheat;
+	border-radius:3px;
+	border:none;
+}
+.centerDiv{
+	margin:auto;
+}
+#closeBtn{
+	display:none;
+}
+.floatLeft{
+	float:left;
+}
+</style>
+</head>
+<body onload="init()" onunload="writeHighScore()" class="centerThis" id="bodyID">
+	<div>
+		<div>
+			<div id="container">
+				<div id="instructions"></div>
+				<canvas id="lulzcanvas" width="500" height="500"></canvas>
+				<div>
+					<p>
+						<label id="scorelbl" class="floatLeft">Score:</label>
+						<label id="scorecount" class="floatLeft"></label>
+						<label id="copyright">copyright 2013</label>
+					</p>
+					<p style="clear: both;">Move: Arrow Keys | Pause: P | Restart after Game Over: Enter</p>
+					<p>Slug Version <label id="version"></label></p>
+				</div>
+			</div>
+			<div id="alertOverlay" class="centerThis">
+				<div>
+					<div>
+						<div class="backgroundContainer centerDiv">
+							<div id="Name" >
+								<p>Woot! High Score!</p>
+								<p>
+									<input type="text" id="txtplayerName" maxlength="3" placeholder="Enter your Name"/>
+									<input type="button" value="Save" onclick="savePlayerName()"</>
+								</p>
+							</div>
+							<div id="scoreTable"></div>
+							<div id="closeBtn">
+								<p>
+									<input type="button" onclick="hideHighScoreTable()" value="Close"/>
+								</p>
+							</div>
+							<div id="alertDiv">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
