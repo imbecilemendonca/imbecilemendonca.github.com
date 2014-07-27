@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<head>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    /*GRID FUNCTIONS*/
+        $().ready(function(){
+            generateGrid();
+        });
+        var gridMaxSize = 9;
+        var gridMinSize = 0;
+        var gridMiddle = Math.ceil((gridMinSize+gridMaxSize)/2);
+        var restartGame = false;
+        function generateGrid(){
+            appendLI ="";
+            for(var i=gridMinSize;i<=gridMaxSize;i++){
+                appendLI += "<li class='gridCell' col='"+i+"'></li>";
+            }
+            appendUL = "";
+            for(i=gridMinSize;i<=gridMaxSize;i++){
+                appendUL += "<ul class='gridRow' row='"+i+"'>"+appendLI+"</ul>";
+            }
+            $(".grid").append(appendUL);
+            initGame();
+        }
+        function initGame(){
+            init_pong();
+            init_paddles();
+            registerKeypressFunctions();   
+        }
+        function restartPongGame(){
+            clearTimeout(pongTimeout);
+            $(".ball").addClass("restart");
+            setTimeout(function(){init_pong();},1500);   
+        }
+    /*INIT PONG*/
+        var pongball={};
+        var enumHorDir = {
+            LEFT: 0, RIGHT: 1
+        };
+        var enumVerDir = {
+            UP: 0, DOWN: 1
+        };
+        var currentPongHorDir;
+        var currentPongVerDir;
+        var currentPongAngle;
+        function init_pong(){
+            restartGame = false;
+            $(".restart").removeClass("restart");
+            currentPongHorDir = randomizePongDir();
+            currentPongVerDir = randomizePongDir();
+            currentPongAngle = randomizePongAngle();
+
+            pongball.x=gridMiddle;
+            pongball.y=gridMiddle;
+            drawPong();
+            setTimeout(function(){movePong();},1500);
+        }
+    /*INIT PADDLES*/
+        var paddleLeft = {}; var paddleRight = {};
+        var paddleLeftClass = "left", paddleRightClass = "right";
+        var paddleSize = 3;
+        function init_paddles(){
+            init_paddleLeft();
+            init_paddleRight();
+        }
+        function init_paddleLeft(){           
+            paddleLeft.x=gridMinSize;
+            paddleLeft.y=gridMiddle-1;   
+            drawPaddle(paddleLeft, paddleLeftClass); 
+        }
+        function init_paddleRight(){          
+            paddleRight.x=gridMaxSize;
+            paddleRight.y=gridMiddle-1;   
+            drawPaddle(paddleRight, paddleRightClass);
+        }
+
+    /*MOVE PADDLES*/
+        function registerKeypressFunctions(){
+            document.onkeydown = function() {
+                if(restartGame) return;
+                switch (window.event.keyCode) {
+                    case 87://move left paddle up W
+                        movePaddle(paddleLeft, enumVerDir.UP, paddleLeftClass);
+                        break;
+                    case 83://move left paddle down S
+                        movePaddle(paddleLeft, enumVerDir.DOWN, paddleLeftClass);
+                        break;
+                    case 38://move right paddle up arrow key
+                        movePaddle(paddleRight, enumVerDir.UP, paddleRightClass);
+                        break;
+                    case 40://move right paddle down arrow key
+                        movePaddle(paddleRight, enumVerDir.DOWN, paddleRightClass);
+                        break;
+                }
+            };
+        }
+        function movePaddle(paddle, dir, paddleclass){
+            if(dir == enumVerDir.DOWN && paddle.y<gridMaxSize-(paddleSize-1)){
+                paddle.y+=1;
+            }else if(dir == enumVerDir.UP && paddle.y>gridMinSize){
+                paddle.y-=1;
+            }else{
+                return;
+            }
+            drawPaddle(paddle, paddleclass);
+        }
+        function drawPaddle(paddle, paddleclass){         
+            $(".paddle."+paddleclass).removeClass("paddle "+paddleclass);
+            x=paddle.x+1;
+            for(var i=1;i<=paddleSize;i++){  
+                y=paddle.y+i;
+                 $(".grid ul:nth-child("+y+") li:nth-child("+x+")").addClass("paddle "+paddleclass);
+            }                    
+        }
+    /*MOVE PONG*/
+        function drawPong(){            
+            $(".ball").removeClass("ball");
+            x=pongball.x+1;
+            y=pongball.y+1;
+            $(".grid ul:nth-child("+y+") li:nth-child("+x+")").addClass('ball');
+        }
+        var pongTimeout;
+        function movePong(){
+            checkPongCollision();
+            if(restartGame) return;
+            switch(currentPongHorDir){
+                case enumHorDir.LEFT: pongball.x-=1;break;
+                case enumHorDir.RIGHT: pongball.x+=1;break;  
+            }
+            switch(currentPongVerDir){
+                case enumVerDir.UP: pongball.y-=currentPongAngle;break;
+                case enumVerDir.DOWN: pongball.y+=currentPongAngle;break;
+            }
+            if(pongball.x<gridMinSize) pongball.x=gridMinSize;
+            if(pongball.x>gridMaxSize) pongball.x=gridMaxSize;
+            if(pongball.y<gridMinSize) pongball.y=gridMinSize;
+            if(pongball.y>gridMaxSize) pongball.y=gridMaxSize;
+            drawPong();
+            pongTimeout = setTimeout(function(){movePong();},700);
+        }
+    /*RANDOMIZE PONG POSITION FUNCTIONS*/
+        function randomizePongDir(){
+            return Math.floor(Math.random()*2);
+        }
+        function randomizePongAngle(){
+            return 1;//Math.floor(Math.random()*3);
+        }
+    /*COLLISION FUNCTIONS*/
+        function checkPongCollision(){
+            //check diagonal collision to bounce back
+            if((currentPongHorDir == enumHorDir.LEFT && pongball.x == paddleLeft.x+1 && pongball.y+1 >= paddleLeft.y && pongball.y+1<=paddleLeft.y+paddleSize && pongball.y<paddleLeft.y)||(currentPongHorDir == enumHorDir.LEFT && pongball.x == paddleLeft.x+1 && pongball.y-1 >= paddleLeft.y && pongball.y-1<=paddleLeft.y+paddleSize && pongball.y>paddleLeft.y+paddleSize-1)||(currentPongHorDir == enumHorDir.RIGHT && pongball.x == paddleLeft.x-1 && pongball.y+1 >= paddleLeft.y && pongball.y+1<=paddleLeft.y+paddleSize && pongball.y<paddleLeft.y)||(currentPongHorDir == enumHorDir.RIGHT && pongball.x == paddleLeft.x-1 && pongball.y-1 >= paddleLeft.y && pongball.y-1<=paddleLeft.y+paddleSize && pongball.y>paddleLeft.y+paddleSize-1)){
+                flipPongHorDir();
+                flipPongVerDir();                
+            }
+            //check left paddle collision hor & ver
+            else if((currentPongHorDir == enumHorDir.LEFT && pongball.x == paddleLeft.x+1 && pongball.y >= paddleLeft.y && pongball.y<=paddleLeft.y+paddleSize)||(currentPongHorDir == enumHorDir.RIGHT && pongball.x == paddleRight.x-1 && pongball.y >= paddleRight.y && pongball.y<=paddleRight.y+paddleSize)){
+                flipPongHorDir();
+            }
+            //check top and bottom wall collision hor & ver
+            else if((currentPongVerDir == enumVerDir.UP && pongball.y == gridMinSize) || (currentPongVerDir == enumVerDir.DOWN && pongball.y == gridMaxSize)){
+                flipPongVerDir();
+            }
+            //restart game
+            else if((currentPongHorDir == enumHorDir.LEFT && pongball.x == gridMinSize) || (currentPongHorDir == enumHorDir.RIGHT && pongball.x == gridMaxSize)){
+                restartGame = true;
+                restartPongGame();
+            }
+        }
+        function flipPongHorDir(){
+            if(currentPongHorDir == enumHorDir.LEFT)
+                currentPongHorDir = enumHorDir.RIGHT;
+            else if(currentPongHorDir == enumHorDir.RIGHT)
+                currentPongHorDir = enumHorDir.LEFT;
+        }
+        function flipPongVerDir(){
+            if(currentPongVerDir == enumVerDir.UP)
+                currentPongVerDir = enumVerDir.DOWN;
+            else if(currentPongVerDir == enumVerDir.DOWN)
+                currentPongVerDir = enumVerDir.UP;
+        } 
+    </script>
+    <style>
+        .ball{background:red !important;}
+        .ball.restart{background:orange!important;}
+        .paddle{background:blue !important;}
+        .grid{
+            height:100%;
+            width:100%;
+        }
+        .gridRow{
+            height:10%;
+            width:100%;
+            padding: 0;
+            margin: 2px 0;
+        }
+        .gridCell{
+            height:100%;
+            width:8.67%;
+            display:inline-block;
+            margin:0 2px;
+            background:pink;
+        }
+        .wrapper{
+            margin: auto;
+            width: 300px;
+            height: 300px;        
+        }
+        label span{
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <label><span>Left Player Controls:</span><br> W: move up | S: move down</label><br><br>
+        <label><span>Right Player Controls:</span><br> UP arrow key: move up | DOWN arrow key: move down</label>
+        <div class="grid"></div>
+    </div>
+</body>
+</html>
