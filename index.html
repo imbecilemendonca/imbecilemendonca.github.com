@@ -2,22 +2,41 @@
 <html ng-app="janeM">
 <head>
 	<title>Jane Mendonca</title>
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-	<script type="text/javascript" src="js/index.js"></script>
   <link href="css/index.css" rel="stylesheet" type="text/css"></link>
 </head>
 <body>
-  <div class="wrapper">
-    <section><p class="textaligncenter"><img src="images/construction.png"></p></section>
-    <section ng-controller="AboutMe as me" class="textaligncenter">   
-      <label class="fontsize48">{{me.product.firstName +" "+ me.product.lastName}}</label>
-      <ul>
-        <li ng-repeat="obj in me.product.designation">{{obj.title}}</li>
-      </ul> 
-      <ul class="fontsize24">
-        <li class="lsf" ng-repeat="obj in me.product.links"><a ng-href="{{obj.url}}">{{obj.text}}</a></li>
-      </ul>
-    </section>
-  </div>	
+  <main class="wrapper">
+    <header>
+      <section ng-controller="AboutMeCtrl" class="textaligncenter sectionAboutMe"><div aboutme></div></section>
+      <section ng-controller="ReferencesCtrl" class="sectionReferences"><div ref></div></section>
+    </header>
+    <article ng-controller="ContentCtrl" class="textaligncenter">
+      <div menuoptions></div>
+      <div contentarea></div>
+    </article>
+  </main>	
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+  <script type="text/ng-template" id="code.template.html">
+    <div>
+      <label>A Single-Player game of Snake through the eyes of a Slug (or not).</label><br><br>
+      <input value="Play Snake/Slug!" type="button" onclick="window.open('demo/Slug.html')"/>
+    </div>
+  </script>  
+  <script type="text/ng-template" id="tabletennis.template.html">
+    <div>
+      <label>A Multi-Player game that employs the basic logic of a Table-tennis match.</label><br><br>
+      <input value="Play Table Tennis!" type="button" onclick="window.open('demo/tabletennis.html')"/>
+    </div>
+  </script>  
+  <script type="text/ng-template" id="design.template.html">
+    <div imageslider></div>
+  </script>
+  <script type="text/ng-template" id="resume.template.html">
+    <div>
+      <input value="View Resume" type="button" onclick="window.open('resume/ResumeNoPhoneNumber.pdf')"/>
+    </div>
+  </script>
 </body>
 </html>
