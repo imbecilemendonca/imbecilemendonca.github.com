@@ -36,25 +36,25 @@
 		};
 
 		$scope.images = [
-			{	caption:"British Accents - The Adventures of Colin and Jeeves: Comic Strip", url:"images/colinjeeves.png",
+			{	caption:"British Accents - The Adventures of Colin and Jeeves: Comic Strip", url:"../images/colinjeeves.png",
 				about:"Jeeves and his pet Colin embark on exciting Adventures as they learn about various Workplace Concepts."},
-			{	caption:"Daenerys - Game of Thrones Bookmark: Front",url:"images/daenerysbookmarkfront.png",
+			{	caption:"Daenerys - Game of Thrones Bookmark: Front",url:"../images/daenerysbookmarkfront.png",
 				about:"The front sides of 3 separate bookmarks in Colour, Sepia and Monochrome."},
-			{	caption:"Daenerys - Game of Thrones Bookmark: Back",url:"images/daenerysbookmarkback.png",
+			{	caption:"Daenerys - Game of Thrones Bookmark: Back",url:"../images/daenerysbookmarkback.png",
 				about:"The back sides of 3 separate bookmarks in Colour, Sepia and Monochrome."}, 
-			{	caption:"Pixelated: A Self Potrait",url:"images/jane8bit.png",
+			{	caption:"Pixelated: A Self Potrait",url:"../images/jane8bit.png",
 				about:"Retro Me."},
-			{	caption:"Vectorised: A Self Potrait",url:"images/janevector.png",
+			{	caption:"Vectorised: A Self Potrait",url:"../images/janevector.png",
 				about:"Vectorised Me!"}, 
-			{	caption:"Tottenham-Liverpool Infographic: Match Statistics",url:"images/totliv.jpg",
+			{	caption:"Tottenham-Liverpool Infographic: Match Statistics",url:"../images/totliv.jpg",
 				about:"Poster Design for The Top Corner"}, 
-			{	caption:"West Brom-Man City: Pre-Match Poster",url:"images/wbrommancity.jpg",
+			{	caption:"West Brom-Man City: Pre-Match Poster",url:"../images/wbrommancity.jpg",
 				about:"Poster Design for The Top Corner"},
-			{	caption:"Arsenal vs Chelsea: Post-Match Poster",url:"images/chelars.jpg",
+			{	caption:"Arsenal vs Chelsea: Post-Match Poster",url:"../images/chelars.jpg",
 				about:"Poster Design for The Top Corner"}, 
-			{	caption:"Digital Colour & Digital Inking (ONLY)",url:"images/facescolour.jpg",
+			{	caption:"Digital Colour & Digital Inking (ONLY)",url:"../images/facescolour.jpg",
 				about:"Drawn by the friend of a friend."},
-			{	caption:"A look into the iPad Theatre Menu: App Design",url:"images/ipadmenuapp.png",
+			{	caption:"A look into the iPad Theatre Menu: App Design",url:"../images/ipadmenuapp.png",
 				about:"Just an insight into an app of 10 screens!"}];
 		$scope.currentIndex=0;
 		$scope.loadPreviousImage = function(){
