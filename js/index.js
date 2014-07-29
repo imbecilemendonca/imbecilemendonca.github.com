@@ -81,7 +81,7 @@
 				instr: 'Move: Arrow Keys | Pause: P | Restart after Game Over: Enter'				
 			},
 			{
-				caption: 'A Multi-Player game that employs the basic logic of a Table-tennis match. Current support: keyboard input only',
+				caption: 'A Multi-Player game that employs the basic logic of a Table-tennis match. Current support: Webkit browsers; keyboard input only',
 				title: 'Table Tennis',
 				url: 'demo/tabletennis.html',
 				instr: 'Left Player Controls: W: move up | S: move down. \r\nRight Player Controls:UP arrow key: move up | DOWN arrow key: move down'
