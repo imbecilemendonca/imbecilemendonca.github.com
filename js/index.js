@@ -15,19 +15,19 @@
 	app.controller('ReferencesCtrl', ['$scope',function($scope){
 		$scope.references = {links: [{text: 'facebook',url: 'http://facebook.com/imbecile.art'},{text: 'linkedin',url: 'https://www.linkedin.com/pub/jane-mendonca/43/18a/ab2'},
 				{text: 'youtube',url: 'http://www.youtube.com/user/ZDwarf/videos'}]};
-		$scope.contact = {title:"Contact: ",info:"janemendonca@zomgzomg.com"};
+		$scope.contact = {title:"Contact Jane",info:"janemendonca@zomgzomg.com"};
 	}]).directive('ref', function(){
 		return {
-			template: 	'<ul class="fontsize30 horizontal textalignright"><li class="lsf" ng-repeat="obj in references.links"><a ng-href="{{obj.url}}">{{obj.text}}</a></li></ul>'+
-						'<br><label>{{contact.title+" "+contact.info}}</label>'
+			template: 	'<ul class="fontsize30 horizontal textalignright"><li class="lsf" ng-repeat="obj in references.links"><a target="_blank" ng-href="{{obj.url}}">{{obj.text}}</a></li></ul>'+
+						'<br><a href="mailto:{{contact.info}}">{{contact.title}}</a>'
 		};
 	});
 
 	//menu options
 	app.controller('ContentCtrl', ['$scope',function($scope){
-		$scope.menu = {options:[{title: 'Snake/Slug', url:'code.template.html'},{title: 'Table Tennis', url:'tabletennis.template.html'},{title: 'Design', url:'design.template.html'},
-		{title: 'Resume', url:'resume.template.html'}]};
-		$scope.currentTab='code.template.html';		
+		$scope.menu = {options:[{title: 'Snake/Slug', url:'snake.template.html'},{title: 'Table Tennis', url:'tt.template.html'},
+		{title: 'Design', url:'design.template.html'},{title: 'Resume', url:'resume.template.html'}]};
+		$scope.currentTab='snake.template.html';		
 		$scope.selectMenu = function(mobj){
 			$scope.currentTab=mobj.url;
 		};
@@ -35,6 +35,7 @@
 			return mobj == $scope.currentTab;
 		};
 
+		//images content
 		$scope.images = [
 			{	caption:"British Accents - The Adventures of Colin and Jeeves: Comic Strip", url:"../images/colinjeeves.png",
 				about:"Jeeves and his pet Colin embark on exciting Adventures as they learn about various Workplace Concepts."},
@@ -70,6 +71,31 @@
 		 
 		  $scope.images[$scope.currentIndex].visible = true;
 		});
+
+		//games content
+		$scope.games = [
+			{
+				caption: 'A Single-Player game of Snake through the eyes of a Slug (or not). Current support: keyboard input only',
+				title: 'Snake/Slug',
+				url: 'demo/slug.html',
+				instr: 'Move: Arrow Keys | Pause: P | Restart after Game Over: Enter'				
+			},
+			{
+				caption: 'A Multi-Player game that employs the basic logic of a Table-tennis match. Current support: keyboard input only',
+				title: 'Table Tennis',
+				url: 'demo/tabletennis.html',
+				instr: 'Left Player Controls: W: move up | S: move down. \r\nRight Player Controls:UP arrow key: move up | DOWN arrow key: move down'
+			}
+		];
+
+		$scope.gameIndex=0;
+		$scope.$watch('currentTab', function() {
+			if($scope.currentTab == 'snake.template.html')
+				$scope.gameIndex=0;
+			else if($scope.currentTab == 'tt.template.html')
+				$scope.gameIndex=1;
+		});
+
 	}]).directive('menuoptions',function(){
 		return {
 			template: '<nav><section><ul class="horizontal"><li ng-repeat="opt in menu.options" ng-class="{active: activeMenu(opt.url)}" ng-click="selectMenu(opt)">{{opt.title}}</li></ul></section></nav>'
@@ -82,6 +108,26 @@
 		return {
 			template: '<input value="back" type="button" class="lsf" ng-click="loadPreviousImage()"/><input value="next" type="button" class="lsf" ng-click="loadNextImage()"/>'+
 			'<figure ng-repeat="img in images" ng-show="img.visible"><img src="{{img.url}}"><figcaption class="fontweightbold">{{img.caption}}</figcaption><figcaption class="fontsize14">{{img.about}}</figcaption></figure>'
+		}
+	}).directive('game', function(){
+		return {
+			template: '<section><label>{{games[gameIndex].caption}}</label><br><label>{{games[gameIndex].instr}}</label><br>'+
+			'<div id="framewrap"><iframe id="frame" src="{{games[gameIndex].url}}" focus="true"></iframe></div></section>'
+		}
+	}).directive('focus', function($timeout) {
+		return {
+			scope : {
+				 trigger : '@focus'
+			},
+			link : function(scope, element) {
+				scope.$watch('trigger', function(value) {
+  					if (value === "true") {
+   						$timeout(function() {
+   							element[0].focus();
+   						});
+  					}
+ 				});
+   			}
 		}
 	});
 }) ();
