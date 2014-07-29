@@ -40,7 +40,7 @@
 			{	caption:"British Accents - The Adventures of Colin and Jeeves: Comic Strip", url:"../images/colinjeeves.png",
 				about:"Jeeves and his pet Colin embark on exciting Adventures as they learn about various Workplace Concepts."},
 			{	caption:"Daenerys - Game of Thrones Bookmark: Front",url:"../images/daenerysbookmarkfront.PNG",
-				about:"The front sides of 3 separate bookmarks in Colour, Sepia and Monochrome."},
+				about:"The front sides of 3 separate bookmarks in Sepia, Colour and Monochrome."},
 			{	caption:"Daenerys - Game of Thrones Bookmark: Back",url:"../images/daenerysbookmarkback.PNG",
 				about:"The back sides of 3 separate bookmarks in Colour, Sepia and Monochrome."}, 
 			{	caption:"Pixelated: A Self Potrait",url:"../images/jane8bit.png",
