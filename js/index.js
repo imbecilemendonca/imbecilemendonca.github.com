@@ -15,7 +15,7 @@
 	app.controller('ReferencesCtrl', ['$scope',function($scope){
 		$scope.references = {links: [{text: 'facebook',url: 'http://facebook.com/imbecile.art'},{text: 'linkedin',url: 'https://www.linkedin.com/pub/jane-mendonca/43/18a/ab2'},
 				{text: 'youtube',url: 'http://www.youtube.com/user/ZDwarf/videos'}]};
-		$scope.contact = {title:"Contact Jane",info:"janemendonca@zomgzomg.com"};
+		$scope.contact = {title:"Contact Jane",info:"jane.zomgzomg@gmail.com"};
 	}]).directive('ref', function(){
 		return {
 			template: 	'<ul class="fontsize30 horizontal textalignright"><li class="lsf" ng-repeat="obj in references.links"><a target="_blank" ng-href="{{obj.url}}">{{obj.text}}</a></li></ul>'+
